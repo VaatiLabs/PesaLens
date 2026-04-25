@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PesaLens — M-Pesa Statement Analyzer</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- PDF.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <!-- jsPDF CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+
+  <!-- ========== SCREEN 1: UPLOAD SCREEN ========== -->
+  <div id="upload-screen" class="screen active">
+
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        🔍 <span>Pesa</span>Lens
+      </div>
+      <p class="tagline">See your M-Pesa money clearly</p>
+    </header>
+
+    <!-- Upload Box -->
+    <main class="upload-container">
+      <div class="upload-box" id="upload-box">
+        <div class="upload-icon">📂</div>
+        <h2>Upload Your M-Pesa Statement</h2>
+        <p>Drag and drop your file here or click to browse</p>
+        <p class="formats">Supports <strong>PDF</strong> and <strong>CSV</strong></p>
+        <input
+          type="file"
+          id="file-input"
+          accept=".csv,.pdf"
+          hidden
+        />
+        <button class="btn-upload" onclick="document.getElementById('file-input').click()">
+          Choose File
+        </button>
+      </div>
+
+      <!-- Privacy Notice -->
+      <div class="privacy-notice">
+        🔒 Your data never leaves your device. We never see,
+        store, or transmit your financial data.
+      </div>
+
+      <!-- Demo Button -->
+      <button class="btn-demo" id="demo-btn">
+        📄 Try with Sample Statement
+      </button>
+
+      <!-- Error Message -->
+      <div class="error-msg" id="error-msg"></div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <p>Built for Kenyan businesses by
+        <strong>VaatiLabs</strong> 🇰🇪
+      </p>
+    </footer>
+
+  </div>
+
+
+  <!-- ========== SCREEN 2: DASHBOARD SCREEN ========== -->
+  <div id="dashboard-screen" class="screen">
+
+    <!-- Dashboard Header -->
+    <header class="dashboard-header">
+      <div class="logo small">
+        🔍 <span>Pesa</span>Lens
+      </div>
+      <div class="header-actions">
+        <span id="statement-period">Jan 2025</span>
+        <button class="btn-export" id="export-btn">
+          📥 Export PDF
+        </button>
+        <button class="btn-back" id="back-btn">
+          ← New Statement
+        </button>
+      </div>
+    </header>
+
+    <!-- Summary Cards -->
+    <section class="summary-cards">
+      <div class="card income">
+        <div class="card-icon">💚</div>
+        <div class="card-label">Total In</div>
+        <div class="card-value" id="total-in">KSh 0</div>
+      </div>
+      <div class="card expense">
+        <div class="card-icon">🔴</div>
+        <div class="card-label">Total Out</div>
+        <div class="card-value" id="total-out">KSh 0</div>
+      </div>
+      <div class="card profit">
+        <div class="card-icon">💵</div>
+        <div class="card-label">Net Balance</div>
+        <div class="card-value" id="net-balance">KSh 0</div>
+      </div>
+      <div class="card transactions">
+        <div class="card-icon">📊</div>
+        <div class="card-label">Transactions</div>
+        <div class="card-value" id="total-transactions">0</div>
+      </div>
+    </section>
+
+    <!-- Charts Section -->
+    <section class="charts-section">
+
+      <!-- Daily Revenue Chart -->
+      <div class="chart-box wide">
+        <h3>📈 Daily Income vs Expenses</h3>
+        <canvas id="daily-chart"></canvas>
+      </div>
+
+      <!-- Category Pie Chart -->
+      <div class="chart-box">
+        <h3>🥧 Expense Categories</h3>
+        <canvas id="category-chart"></canvas>
+      </div>
+
+      <!-- Balance Over Time -->
+      <div class="chart-box">
+        <h3>📉 Balance Over Time</h3>
+        <canvas id="balance-chart"></canvas>
+      </div>
+
+    </section>
+
+    <!-- Top Senders & Recipients -->
+    <section class="top-section">
+      <div class="top-box">
+        <h3>🏆 Top Income Sources</h3>
+        <div id="top-income-list"></div>
+      </div>
+      <div class="top-box">
+        <h3>💸 Top Expenses</h3>
+        <div id="top-expense-list"></div>
+      </div>
+    </section>
+
+    <!-- Transaction Table -->
+    <section class="table-section">
+      <div class="table-header">
+        <h3>📋 All Transactions</h3>
+        <input
+          type="text"
+          id="search-input"
+          placeholder="🔍 Search transactions..."
+          class="search-box"
+        />
+        <select id="filter-type" class="filter-select">
+          <option value="all">All Types</option>
+          <option value="INCOME">Income Only</option>
+          <option value="EXPENSE">Expenses Only</option>
+          <option value="TRANSFER">Transfers Only</option>
+        </select>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="transaction-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Details</th>
+              <th>Type</th>
+              <th>Platform</th>
+              <th>Paid In</th>
+              <th>Withdrawn</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody id="transaction-body">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- JavaScript Files -->
+  <script src="js/parser.js"></script>
+  <script src="js/categorizer.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/exporter.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
